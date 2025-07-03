@@ -21,19 +21,21 @@ document.addEventListener("DOMContentLoaded", () => {
   async function getIpInfo() {
     try {
       const ipResponse = await $.get("https://api64.ipify.org?format=json");
-      const ipData = await $.get(`https://ip-api.com/json/${ipResponse.ip}`);
+      const ipData = await $.get(
+        `https://freeipapi.com/api/json/${ipResponse.ip}`
+      );
 
       return {
         ip: ipResponse.ip,
-        city: ipData.city || "Desconhecido",
+        city: ipData.cityName || "Desconhecido",
         state: ipData.regionName || "Desconhecido",
         isProxy: ipData.isProxy || false,
-        latitude: ipData.lat?.toString() || "Desconhecido",
-        longitude: ipData.lon?.toString() || "Desconhecido",
+        latitude: ipData.latitude?.toString() || "Desconhecido",
+        longitude: ipData.longitude?.toString() || "Desconhecido",
       };
     } catch (error) {
       return {
-        ip: ipResponse.ip,
+        ip: "Não foi possível coletar o IP",
         city: "Desconhecido",
         state: "Desconhecido",
         isProxy: false,
