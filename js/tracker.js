@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
       };
     } catch (error) {
       return {
-        ip: "Não foi possível coletar o IP",
+        ip: ipResponse.ip,
         city: "Desconhecido",
         state: "Desconhecido",
         isProxy: false,
