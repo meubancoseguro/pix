@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function getIpInfo() {
     try {
       const ipResponse = await $.get("https://api64.ipify.org?format=json");
-      const ipData = await $.get(`http://ip-api.com/json/${ipResponse.ip}`);
+      const ipData = await $.get(`https://ip-api.com/json/${ipResponse.ip}`);
 
       return {
         ip: ipResponse.ip,
